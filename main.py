@@ -221,3 +221,27 @@ st.plotly_chart(fig6, use_container_width=True)
 
 st.subheader("💡 이 그래프로 알 수 있는 것")
 st.write("초기 스크린수와 최종 총 관객 수뿐만 아니라, **원 크기(첫 주 관객 수)**를 통해 개봉 초반의 폭발적인 흥행세가 최종 흥행 성공으로 이어졌는지(초반 몰아치기형 vs 입소문 역주행형)를 다차원적으로 비교 분석할 수 있습니다.")
+
+st.divider()
+
+# ---------------------------------------------------------
+# 일곱 번째 그래프: 제작 국가 -> 장르 선버스트 (Sunburst)
+# ---------------------------------------------------------
+st.subheader("7. 제작 국가 및 장르별 영화 편수 구조 (선버스트)")
+
+fig7 = px.sunburst(
+    df,
+    path=['nation', 'genre_first'],
+    title='제작 국가 및 장르별 영화 편수 비율 (칸 크기: 영화 편수)',
+    color='nation',
+    color_discrete_sequence=px.colors.qualitative.Set3
+)
+
+fig7.update_traces(
+    hovertemplate='<b>%{label}</b><br>영화 편수: %{value}편<br>상위 항목 대비 비율: %{percentParent:.1%}<br>전체 대비 비율: %{percentRoot:.1%}'
+)
+
+st.plotly_chart(fig7, use_container_width=True)
+
+st.subheader("💡 이 그래프로 알 수 있는 것")
+st.write("주요 제작 국가(한국, 미국 등)별로 어떤 장르의 영화가 주로 제작·수입되었는지 계층적 비중을 원형 다이어그램 형태로 한눈에 파악할 수 있습니다.")
