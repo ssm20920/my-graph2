@@ -111,3 +111,39 @@ st.write(
     f"- **밀집 구간**: 대부분의 영화가 **200만~400만 명 이하**의 하위 관객 수 구간에 높게 집중되어 있습니다.\n"
     f"- **최다 관객 영화**: 데이터 내에서 가장 많은 관객을 동원한 영화는 **'{top_movie_name}'**(총 {top_movie_audi:,.0f}명)입니다."
 )
+
+st.divider()
+
+# ---------------------------------------------------------
+# 네 번째 그래프: 개봉일 스크린수 vs 총 관객 수 (산점도)
+# ---------------------------------------------------------
+st.subheader("4. 개봉일 스크린수와 총 관객 수의 관계 (산점도)")
+
+fig4 = px.scatter(
+    df,
+    x='first_scrn',
+    y='total_audi',
+    color='genre_first',
+    hover_name='movieNm',
+    title='개봉일 스크린수(first_scrn) vs 총 관객 수(total_audi)',
+    labels={
+        'first_scrn': '개봉일 스크린수 (개)',
+        'total_audi': '총 관객 수 (명)',
+        'genre_first': '장르'
+    }
+)
+
+fig4.update_traces(
+    marker=dict(size=9, opacity=0.8),
+    hovertemplate='<b>%{hovertext}</b><br>개봉일 스크린수: %{x:,.0f}개<br>총 관객 수: %{y:,.0f}명'
+)
+
+fig4.update_layout(
+    xaxis_title='개봉일 스크린수 (개)',
+    yaxis_title='총 관객 수 (명)'
+)
+
+st.plotly_chart(fig4, use_container_width=True)
+
+st.subheader("💡 이 그래프로 알 수 있는 것")
+st.write("개봉 첫날 확보한 스크린수가 많을수록 대체로 최종 총 관객 수도 높게 나타나는 양의 상관관계를 볼 수 있으며, 초기 스크린 수가 적더라도 흥행에 성공한 아웃라이어 영화들도 확인할 수 있습니다.")
