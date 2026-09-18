@@ -15,7 +15,7 @@ def load_data():
     df = pd.read_csv(url)
     
     # 결측치 및 중복 제거
-    df = df.dropna(subset=['genre', 'movieNm', 'movieCd', 'total_audi', 'first_scrn', 'first_week_audi', 'nation']).copy()
+    df = df.dropna(subset=['genre', 'movieNm', 'movieCd', 'total_audi', 'first_scrn', 'first_week_audi', 'nation', 'days_in_top10']).copy()
     df = df.drop_duplicates(subset=['movieCd']).copy()
     
     # 장르 전처리 (첫 번째 장르만 사용)
@@ -216,3 +216,31 @@ fig7.update_traces(
 
 st.plotly_chart(fig7, use_container_width=True)
 st.info("**이 그래프로 알 수 있는 것:** 영화를 많이 제작 및 공급한 주요 국가의 비중을 파악하고, 각 국가 내부에서 어떤 장르가 주력으로 편성되었는지를 동심원 형태로 한눈에 시각화할 수 있습니다.")
+
+st.markdown("---")
+
+# ---------------------------------------------------------
+# 8. 10위권 체류 일수와 총 관객수의 관계 (산점도)
+# ---------------------------------------------------------
+st.subheader("8. 10위권에 오래 머문 영화는 총 관객도 많은가")
+
+fig8 = px.scatter(
+    df,
+    x='days_in_top10',
+    y='total_audi',
+    color='genre',
+    hover_name='movieNm',
+    title="10위권에 오래 머문 영화는 총 관객도 많은가",
+    labels={
+        'days_in_top10': '10위권에 머문 날수 (일)',
+        'total_audi': '총 관객수 (명)',
+        'genre': '장르'
+    }
+)
+
+fig8.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>10위권 체류 일수: %{x}일<br>총 관객수: %{y:,}명"
+)
+
+st.plotly_chart(fig8, use_container_width=True)
+st.info("**이 그래프로 알 수 있는 것:** 박스오피스 Top 10에 머무른 기간이 길어질수록 총 관객수 역시 확연히 증가하는 강한 양의 상관관계를 확인할 수 있습니다.")
