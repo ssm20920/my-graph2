@@ -25,6 +25,10 @@ def load_data():
     # 장르 전처리 (첫 번째 장르만 사용)
     df['genre'] = df['genre'].astype(str).str.split('|').str[0]
     
+    # 관객 1인당 평균 티켓 단가(객단가) 계산
+    if 'salesAmt' in df.columns:
+        df['avg_ticket_price'] = (df['salesAmt'] / df['total_audi']).round(0)
+    
     # 트리맵용 고유 식별 레이블
     df['movie_label'] = df['movieNm'] + " (" + df['movieCd'].astype(str) + ")"
     
@@ -285,4 +289,35 @@ if 'salesAmt' in df.columns:
     )
 
     st.plotly_chart(fig9, use_container_width=True)
-    st.info("**이 그래프로 알 수 있는 것:** 관객 수와 매출액 간에 매우 강력한 선형(양의) 상관관계가 존재함을 알 수 있으며, 상영관 티켓 단가나 관람 가격대 차이에 따른 이탈점들을 시각적으로 확인할 수 있습니다.")
+    st.info("**이 그래프로 알 수 있는 것:** 관객 수와 매출액 간에 매우 강력한 선형(양의) 상관관계가 존재함을 알 수 있습니다.")
+
+# ---------------------------------------------------------
+# 10. 영화의 관객 수에서 매출액으로 내려가면 무엇이 보이나? (산점도 + 객단가)
+# ---------------------------------------------------------
+if 'salesAmt' in df.columns and 'avg_ticket_price' in df.columns:
+    st.markdown("---")
+    st.subheader("10. 영화의 관객 수에서 매출액으로 내려가면 무엇이 보이나?")
+
+    fig10 = px.scatter(
+        df,
+        x='total_audi',
+        y='salesAmt',
+        size='avg_ticket_price',
+        color='genre',
+        hover_name='movieNm',
+        custom_data=['avg_ticket_price'],
+        title="관객 수 대비 매출액과 평균 티켓 단가(객단가)",
+        labels={
+            'total_audi': '총 관객수 (명)',
+            'salesAmt': '총 매출액 (원)',
+            'avg_ticket_price': '평균 티켓 단가 (원)',
+            'genre': '장르'
+        }
+    )
+
+    fig10.update_traces(
+        hovertemplate="<b>%{hovertext}</b><br>총 관객수: %{x:,}명<br>총 매출액: %{y:,}원<br>평균 티켓 단가: %{customdata[0]:,}/인"
+    )
+
+    st.plotly_chart(fig10, use_container_width=True)
+    st.info("**이 그래프로 알 수 있는 것:** 단순히 관객 수만으로 설명되지 않는 '평균 티켓 단가(객단가)' 차이가 드러납니다. IMAX/4DX 등 특별관 비중이 높은 영화일수록 버블 크기(단가)가 크고 매출액 축(Y축) 위쪽에 위치하는 패턴을 볼 수 있습니다.")
