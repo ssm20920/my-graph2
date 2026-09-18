@@ -56,17 +56,18 @@ st.divider()
 # --- 두 번째 그래프: 장르 및 영화별 총 관객 수 (트리맵) ---
 st.subheader("2. 장르 및 영화별 총 관객 수")
 
-# Plotly 트리맵 생성 (장르 > 영화명 계층 구조)
+# Plotly 트리맵 생성 (path 구조에 px.Constant("전체") 추가 및 고유 레이블 사용)
 fig2 = px.treemap(
     df,
-    path=["genre", "movieNm"],
+    path=[px.Constant("전체"), "genre", "movieLabel"],
     values="total_audi",
+    hover_data={"movieNm": True, "movieLabel": False, "total_audi": ":,명"},
     title="장르 및 개별 영화별 총 관객 수 트리맵",
 )
 
-# 마우스 오버 커스텀
+# 마우스 오버 툴팁 커스텀
 fig2.update_traces(
-    hovertemplate="<b>%{label}</b><br>총 관객 수: %{value:,}명<extra></extra>"
+    hovertemplate="<b>%{customdata[0]}</b><br>총 관객 수: %{value:,}명<extra></extra>"
 )
 
 st.plotly_chart(fig2, use_container_width=True)
