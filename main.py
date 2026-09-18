@@ -18,7 +18,7 @@ def load_data():
     df = pd.read_csv(url)
 
     # 장르 전처리: 세로막대 기호(|)로 분리 후 첫 번째 장르만 추출
-   df["genre"] = df["genre"].astype(str).apply(lambda x: x.split("|")[0])
+   df["genre"] = df["genre"].astype(str).str.split("|").str[0]
 
     return df
 
