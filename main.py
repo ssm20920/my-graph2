@@ -17,11 +17,10 @@ def load_data():
     url = "https://raw.githubusercontent.com/greatsong/modudata/main/data/kobis_movies.csv"
     df = pd.read_csv(url)
     
-    # 장르 열 전처리: 세로막대 기호(|)로 여러 개 적힌 경우 첫 번째 장르만 추출
-    df['genre'] = df['genre'].astype(str).apply(lambda x: x.split('|')[0] if x != 'nan' else x)
+    # .str.split()을 사용하여 첫 번째 장르만 추출 (PyArrow 데이터 타입 문제 해결)
+    df['genre'] = df['genre'].astype(str).str.split('|').str[0]
     
     return df
-
 df = load_data()
 
 # ---------------------------------------------------------
