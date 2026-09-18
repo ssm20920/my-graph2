@@ -15,7 +15,7 @@ def load_data():
     df = pd.read_csv(url)
     
     # 결측치 및 중복 제거
-    df = df.dropna(subset=['genre', 'movieNm', 'movieCd', 'total_audi', 'first_scrn']).copy()
+    df = df.dropna(subset=['genre', 'movieNm', 'movieCd', 'total_audi', 'first_scrn', 'first_week_audi']).copy()
     df = df.drop_duplicates(subset=['movieCd']).copy()
     
     # 장르 전처리 (첫 번째 장르만 사용)
@@ -140,7 +140,6 @@ st.markdown("---")
 # ---------------------------------------------------------
 st.subheader("5. 주요 장르별 총 관객 수 분포")
 
-# 영화 수가 10편 이상인 장르만 필터링
 genre_counts_series = df['genre'].value_counts()
 major_genres = genre_counts_series[genre_counts_series >= 10].index
 df_major_genres = df[df['genre'].isin(major_genres)]
@@ -156,7 +155,7 @@ fig5 = px.box(
         'genre': '장르',
         'total_audi': '총 관객 수 (명)'
     },
-    points='outliers'  # 이상치(outliers)만 점으로 표시
+    points='outliers'
 )
 
 fig5.update_traces(
@@ -165,3 +164,34 @@ fig5.update_traces(
 
 st.plotly_chart(fig5, use_container_width=True)
 st.info("**이 그래프로 알 수 있는 것:** 주요 장르별 관객 수의 중간값과 분포 범위를 비교할 수 있으며, 상자 밖의 점(이상치)을 통해 해당 장르에서 대형 흥행을 거둔 이변작들을 확인할 수 있습니다.")
+
+st.markdown("---")
+
+# ---------------------------------------------------------
+# 6. 개봉일 스크린수, 총 관객수, 첫 주 관객수의 관계 (버블 차트)
+# ---------------------------------------------------------
+st.subheader("6. 개봉일 스크린수 vs 총 관객수 (첫 주 관객수 반영 버블 차트)")
+
+fig6 = px.scatter(
+    df,
+    x='first_scrn',
+    y='total_audi',
+    size='first_week_audi',
+    color='genre',
+    hover_name='movieNm',
+    size_max=40,
+    title="개봉일 스크린수, 총 관객수 및 첫 주 관객수의 관계",
+    labels={
+        'first_scrn': '개봉일 스크린수 (개)',
+        'total_audi': '총 관객수 (명)',
+        'first_week_audi': '개봉 첫 주 관객수 (명)',
+        'genre': '장르'
+    }
+)
+
+fig6.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>개봉일 스크린수: %{x:,}개<br>총 관객수: %{y:,}명<br>첫 주 관객수: %{marker.size:,}명"
+)
+
+st.plotly_chart(fig6, use_container_width=True)
+st.info("**이 그래프로 알 수 있는 것:** 개봉일 스크린수와 총 관객수의 관계에 더해 버블의 크기로 '개봉 첫 주 관객수'까지 종합적으로 판단할 수 있어, 초반 몰아치기 흥행작과 입소문으로 뒷심을 발휘한 영화를 구분할 수 있습니다.")
