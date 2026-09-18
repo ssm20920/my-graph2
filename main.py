@@ -87,7 +87,6 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 # -------------------------------------------------------------------
 st.header("3. 총 관객 수 분포")
 
-# 히스토그램 생성
 fig3 = px.histogram(
     df,
     x="total_audi",
@@ -101,12 +100,11 @@ fig3.update_traces(
 
 st.plotly_chart(fig3, use_container_width=True)
 
-# 데이터 동적 동기화 (최다 관객 영화 정보 추출)
+# 최다 관객 영화 데이터 추출
 top_movie = df.loc[df["total_audi"].idxmax()]
 top_movie_name = top_movie["movieNm"]
 top_movie_audi = top_movie["total_audi"]
 
-# 구분선 및 설명 구역
 st.markdown("---")
 st.subheader("💡 이 그래프로 알 수 있는 것")
 st.markdown(
@@ -114,4 +112,39 @@ st.markdown(
 - 대부분의 영화가 **하위 관객 수 구간(약 100만~300만 명 대)**에 밀집해 있는 오른쪽으로 긴 꼬리를 가진 양의 왜도(Positive Skewness) 분포를 보입니다.
 - 데이터에서 가장 관객 수가 많은 최상위 흥행 영화는 **'{top_movie_name}'** (총 {top_movie_audi:,.0f}명)입니다.
 """
+)
+
+st.markdown("<br><br>", unsafe_allow_html=True)
+
+# -------------------------------------------------------------------
+# [네 번째 그래프] 개봉일 스크린 수 vs 총 관객 수 (산점도)
+# -------------------------------------------------------------------
+st.header("4. 개봉일 스크린 수와 총 관객 수의 관계")
+
+# 개봉일 스크린수(X축) - 총 관객 수(Y축) 산점도 생성 (장르별 색상 지정)
+fig4 = px.scatter(
+    df,
+    x="first_scrn",
+    y="total_audi",
+    color="genre",
+    hover_name="movieNm",
+    title="개봉일 스크린 수 대 총 관객 수 산점도",
+    labels={
+        "first_scrn": "개봉일 스크린 수",
+        "total_audi": "총 관객 수",
+        "genre": "장르",
+    },
+)
+
+# 마우스오버 툴팁 서식 지정
+fig4.update_traces(
+    hovertemplate="<b>영화명: %{hovertext}</b><br>개봉일 스크린 수: %{x:,}개<br>총 관객 수: %{y:,.0f}명"
+)
+
+st.plotly_chart(fig4, use_container_width=True)
+
+st.markdown("---")
+st.subheader("💡 이 그래프로 알 수 있는 것")
+st.write(
+    "개봉일 스크린 수가 많을수록 대체로 높은 총 관객 수를 기록하는 양의 상관관계를 보여주며, 동일한 스크린 수 대비 관객 동원력이 뛰어난 흥행 우수작(상단 이상치) 및 장르별 분포 경향을 파악할 수 있습니다."
 )
