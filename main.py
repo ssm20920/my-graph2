@@ -245,11 +245,3 @@ st.plotly_chart(fig7, use_container_width=True)
 
 st.subheader("💡 이 그래프로 알 수 있는 것")
 st.write("주요 제작 국가(한국, 미국 등)별로 어떤 장르의 영화가 주로 제작·수입되었는지 계층적 비중을 원형 다이어그램 형태로 한눈에 파악할 수 있습니다.")
-# ── 그래프 7. 국가에서 장르로 (선버스트) ──
-st.header("7. 국가에서 장르로 (선버스트)")
-df["대표국가"] = df["nation"].str.split("|").str[0]
-counted = (df.groupby(["대표국가", "장르"], as_index=False)
-             .agg(편수=("movieNm", "count")))
-fig7 = px.sunburst(counted, path=["대표국가", "장르"], values="편수")
-st.plotly_chart(fig7, width="stretch")
-st.caption("이 그래프로 알 수 있는 것: (한 문장으로 적어 보세요)")
