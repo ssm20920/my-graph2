@@ -160,7 +160,7 @@ fig5 = px.box(
     labels={"genre": "장르", "total_audi": "총 관객 수"},
 )
 
-# 마우스 오버 툴팁 설정 (이상치 및 데이터 포인트에서 영화명 확인 가능)
+# 마우스 오버 툴팁 설정
 fig5.update_traces(
     hovertemplate="<b>%{hovertext}</b><br>총 관객 수: %{y:,}명<extra></extra>"
 )
@@ -170,4 +170,39 @@ st.plotly_chart(fig5, use_container_width=True)
 # 다섯 번째 그래프 설명 구역
 st.info(
     "**이 그래프로 알 수 있는 것:** 각 장르의 중앙값과 흥행 변동 범위를 비교할 수 있으며, 상자 밖으로 벗어난 이상치 점을 통해 장르 내 초대형 흥행작(대작)을 쉽게 식별할 수 있습니다."
+)
+
+st.divider()
+
+# --- 여섯 번째 그래프: 스크린 수 vs 총 관객 수 (첫 주 관객 수 크기 버블 차트) ---
+st.subheader("6. 스크린 수·총 관객 수·첫 주 관객 수 버블 차트")
+
+# Plotly 버블 차트 생성 (size=first_week_audi)
+fig6 = px.scatter(
+    df,
+    x="first_scrn",
+    y="total_audi",
+    size="first_week_audi",
+    color="genre",
+    hover_name="movieNm",
+    size_max=50,  # 버블의 최대 크기 조절
+    title="개봉일 스크린 수 vs 총 관객 수 (버블 크기: 개봉 첫 주 관객 수)",
+    labels={
+        "first_scrn": "개봉일 스크린 수",
+        "total_audi": "총 관객 수",
+        "first_week_audi": "첫 주 관객 수",
+        "genre": "장르",
+    },
+)
+
+# 마우스 오버 툴팁 커스텀 (첫 주 관객 수 항목 추가)
+fig6.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>개봉일 스크린 수: %{x:,}개<br>총 관객 수: %{y:,}명<br>첫 주 관객 수: %{marker.size:,}명<extra></extra>"
+)
+
+st.plotly_chart(fig6, use_container_width=True)
+
+# 여섯 번째 그래프 설명 구역
+st.info(
+    "**이 그래프로 알 수 있는 것:** 버블의 크기(첫 주 관객 수)를 함께 비교함으로써, 초반 흥행 폭발력이 최종 관객 수 및 초기 스크린 확보와 얼마나 밀접하게 연관되어 있는지 입체적으로 볼 수 있습니다."
 )
