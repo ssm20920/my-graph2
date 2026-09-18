@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# 1. 페이지 기본 설정
+# 페이지 기본 설정
 st.set_page_config(
     page_title="영화 데이터 그래프 도감 2 - 분포와 관계",
     layout="wide"
@@ -11,13 +11,13 @@ st.set_page_config(
 st.title("🎬 영화 데이터 그래프 도감 2 - 분포와 관계")
 st.write("박스오피스 10위권 영화 데이터를 기반으로 장르 분포 및 관계를 시각화합니다.")
 
-# 2. 데이터 불러오기 및 전처리
+# 데이터 불러오기 및 전처리
 @st.cache_data
 def load_data():
     url = "https://raw.githubusercontent.com/greatsong/modudata/main/data/kobis_movies.csv"
     df = pd.read_csv(url)
     
-    # genre 열 안전한 전처리 (첫 번째 장르만 추출)
+    # genre 열 전처리 (첫 번째 장르만 추출)
     if 'genre' in df.columns:
         df['genre'] = df['genre'].astype(str).str.split('|').str[0]
         
@@ -245,4 +245,85 @@ st.plotly_chart(fig_bubble, use_container_width=True)
 st.markdown("---")
 st.markdown("💡 **이 그래프로 알 수 있는 것**")
 st.info("개봉일 스크린수와 총 관객 수의 관계뿐만 아니라, 점의 크기를 통해 개봉 초반(첫 주 관객)의 흥행 규모가 최종 흥행 관객 수에 미치는 영향력을 시각적으로 동시에 비교해 볼 수 있습니다.")
+st.markdown("---")
+
+
+# =========================================================
+# 7. 개봉일 상영횟수 vs 개봉 첫 주 관객 수 관계 (산점도)
+# =========================================================
+st.subheader("7. 개봉일 상영횟수 vs 개봉 첫 주 관객 수 관계")
+
+fig_show_audi = px.scatter(
+    df,
+    x='first_show',
+    y='first_week_audi',
+    color='genre',
+    title="개봉일 상영횟수와 개봉 첫 주 관객 수의 관계",
+    labels={
+        'first_show': '개봉일 상영횟수',
+        'first_week_audi': '개봉 첫 주 관객 수',
+        'genre': '장르'
+    },
+    hover_name='movieNm',
+    custom_data=['movieNm', 'genre']
+)
+
+fig_show_audi.update_traces(
+    hovertemplate="<b>영화명:</b> %{customdata[0]}<br>" +
+                  "<b>장르:</b> %{customdata[1]}<br>" +
+                  "<b>개봉일 상영횟수:</b> %{x:,}회<br>" +
+                  "<b>개봉 첫 주 관객 수:</b> %{y:,}명<extra></extra>"
+)
+
+fig_show_audi.update_layout(
+    xaxis_title="개봉일 상영횟수 (회)",
+    yaxis_title="개봉 첫 주 관객 수 (명)"
+)
+
+st.plotly_chart(fig_show_audi, use_container_width=True)
+
+st.markdown("---")
+st.markdown("💡 **이 그래프로 알 수 있는 것**")
+st.info("개봉 당일 상영 기회가 많이 제공될수록 개봉 첫 주 동안 더 많은 관객을 끌어모으는 강한 양의 상관관계를 파악할 수 있습니다.")
+st.markdown("---")
+
+
+# =========================================================
+# 8. 10위권에 오래 머문 영화는 반영 횟수도 많은가? (산점도)
+# =========================================================
+question_title = "10위권에 오래 머문 영화는 반영 횟수도 많은가?"
+st.subheader(f"8. {question_title}")
+
+fig_stay_audi = px.scatter(
+    df,
+    x='days_in_top10',
+    y='total_audi',
+    color='genre',
+    title=question_title,
+    labels={
+        'days_in_top10': '10위권에 머문 날수',
+        'total_audi': '총 관객 수',
+        'genre': '장르'
+    },
+    hover_name='movieNm',
+    custom_data=['movieNm', 'genre']
+)
+
+fig_stay_audi.update_traces(
+    hovertemplate="<b>영화명:</b> %{customdata[0]}<br>" +
+                  "<b>장르:</b> %{customdata[1]}<br>" +
+                  "<b>10위권에 머문 날수:</b> %{x:,}일<br>" +
+                  "<b>총 관객 수:</b> %{y:,}명<extra></extra>"
+)
+
+fig_stay_audi.update_layout(
+    xaxis_title="10위권에 머문 날수 (일)",
+    yaxis_title="총 관객 수 (명)"
+)
+
+st.plotly_chart(fig_stay_audi, use_container_width=True)
+
+st.markdown("---")
+st.markdown("💡 **이 그래프로 알 수 있는 것**")
+st.info("10위권 내 유지 기간(일수)이 길어질수록 누적 총 관객 수 역시 가파르게 증가하며 장기 흥행(롱런)이 최종 성적을 결정짓는 핵심 요소임을 보여줍니다.")
 st.markdown("---")
