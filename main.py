@@ -19,11 +19,9 @@ def load_data():
     
     # genre 열 전처리 (첫 번째 장르만 추출)
     if 'genre' in df.columns:
-        df['genre'] = df['genre'].astype(str).apply(lambda x: x.split('|')[0] if '|' in x else x)
+        df['genre'] = df['genre'].astype(str).str.split('|').str[0]
         
     return df
-
-df = load_data()
 
 # =========================================================
 # 1. 장르별 영화 편수 (도넛 차트)
