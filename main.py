@@ -25,8 +25,6 @@ def load_data():
 
 df = load_data()
 
-st.divider()
-
 # --- 첫 번째 그래프: 장르별 영화 편수 (도넛 그래프) ---
 st.subheader("1. 장르별 영화 편수 분포")
 
@@ -48,7 +46,32 @@ fig1.update_traces(hovertemplate="<b>%{label}</b><br>편수: %{value}편<br>비�
 
 st.plotly_chart(fig1, use_container_width=True)
 
-# 그래프 설명 구역
+# 첫 번째 그래프 설명 구역
 st.info(
     "**이 그래프로 알 수 있는 것:** 특정 장르가 전체 개봉작 중 얼마나 큰 비중을 차지하는지 한눈에 파악할 수 있습니다."
+)
+
+st.divider()
+
+# --- 두 번째 그래프: 장르 및 영화별 총 관객 수 (트리맵) ---
+st.subheader("2. 장르 및 영화별 총 관객 수")
+
+# Plotly 트리맵 생성 (장르 > 영화명 계층 구조, 칸 크기는 총 관객 수)
+fig2 = px.treemap(
+    df,
+    path=["genre", "movieNm"],
+    values="total_audi",
+    title="장르 및 개별 영화별 총 관객 수 트리맵",
+)
+
+# 마우스 오버 시 영화명(또는 장르)과 총 관객 수가 명확하게 보이도록 설정
+fig2.update_traces(
+    hovertemplate="<b>%{label}</b><br>총 관객 수: %{value:,}명<extra></extra>"
+)
+
+st.plotly_chart(fig2, use_container_width=True)
+
+# 두 번째 그래프 설명 구역
+st.info(
+    "**이 그래프로 알 수 있는 것:** 장르 전체의 규모뿐만 아니라 그 안에서 어떤 영화가 흥행을 주도했는지 직관적으로 비교할 수 있습니다."
 )
