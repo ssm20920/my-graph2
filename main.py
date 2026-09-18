@@ -17,8 +17,8 @@ def load_data():
     url = "https://raw.githubusercontent.com/greatsong/modudata/main/data/kobis_movies.csv"
     df = pd.read_csv(url)
 
-    # 장르 전처리: 세로막대 기호(|)로 분리 후 첫 번째 장르만 추출
-   df["genre"] = df["genre"].astype(str).str.split("|").str[0]
+    # 장르 전처리: 세로막대 기호(|) 기준 분후 첫 번째 장르 추출 (Pandas str 메서드 활용)
+    df["genre"] = df["genre"].astype(str).str.split("|").str[0]
 
     return df
 
