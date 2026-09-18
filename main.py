@@ -141,3 +141,38 @@ st.plotly_chart(fig_scatter, use_container_width=True)
 st.info("💡 **이 그래프로 알 수 있는 것:** 개봉일 스크린수가 많을수록 총 관객 수도 증가하는 양의 상관관계를 보이지만, 일부 영화는 적은 스크린수에도 불구하고 높은 총 관객 수를 기록하는 입소문 흥행 양상을 확인할 수 있습니다.")
 
 st.divider()
+
+# ---------------------------------------------------------
+# 5. 주요 장르별 총 관객 수 분포 (상자 그림)
+# ---------------------------------------------------------
+st.subheader("5. 주요 장르별 총 관객 수 분포 (10편 이상 장르)")
+
+# 영화가 10편 이상인 장르만 추출
+genre_counts_series = df['genre'].value_counts()
+major_genres = genre_counts_series[genre_counts_series >= 10].index
+df_major = df[df['genre'].isin(major_genres)]
+
+# 상자 그림 생성
+fig_box = px.box(
+    df_major,
+    x='genre',
+    y='total_audi',
+    color='genre',
+    hover_name='movieNm',
+    points='outliers',  # 이상치 점 표시
+    title="주요 장르별 총 관객 수 상자 그림",
+    labels={
+        'genre': '장르',
+        'total_audi': '총 관객 수(명)'
+    }
+)
+
+fig_box.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>총 관객 수: %{y:,}명"
+)
+
+st.plotly_chart(fig_box, use_container_width=True)
+
+st.info("💡 **이 그래프로 알 수 있는 것:** 영화 수가 10편 이상인 주요 장르 간 중간 관객 수 및 변동 범위의 차이를 볼 수 있으며, 상자 위쪽에 위치한 점(이상치)을 통해 장르별 대흥행작을 확인할 수 있습니다.")
+
+st.divider()
