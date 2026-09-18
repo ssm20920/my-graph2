@@ -32,11 +32,9 @@ df = load_data()
 # -------------------------------------------------------------------
 st.header("1. 장르별 영화 분포")
 
-# 장르별 편수 집계
 genre_counts = df["genre"].value_counts().reset_index()
 genre_counts.columns = ["genre", "count"]
 
-# Plotly 도넛 차트 생성
 fig1 = px.pie(
     genre_counts,
     values="count",
@@ -44,17 +42,13 @@ fig1 = px.pie(
     hole=0.4,
     title="장르별 영화 편수 비율",
 )
-
-# 마우스오버 시 편수와 비율이 보이도록 설정
 fig1.update_traces(
     textinfo="percent+label",
     hovertemplate="<b>장르: %{label}</b><br>편수: %{value}편<br>비율: %{percent}",
 )
 
-# 그래프 출력
 st.plotly_chart(fig1, use_container_width=True)
 
-# 구분선 및 설명 구역
 st.markdown("---")
 st.subheader("💡 이 그래프로 알 수 있는 것")
 st.write(
@@ -68,25 +62,56 @@ st.markdown("<br><br>", unsafe_allow_html=True)
 # -------------------------------------------------------------------
 st.header("2. 장르 및 영화별 총 관객 수")
 
-# Plotly 트리맵 생성 (계층 구조: 장르 -> 영화명, 크기: 총 관객 수)
 fig2 = px.treemap(
     df,
     path=[px.Constant("전체 영화"), "genre", "movieNm"],
     values="total_audi",
     title="장르 및 영화별 총 관객 수 분포",
 )
-
-# 마우스오버 시 영화명과 총 관객 수가 보이도록 설정
 fig2.update_traces(
     hovertemplate="<b>영화명: %{label}</b><br>총 관객 수: %{value:,.0f}명"
 )
 
-# 그래프 출력
 st.plotly_chart(fig2, use_container_width=True)
 
-# 구분선 및 설명 구역
 st.markdown("---")
 st.subheader("💡 이 그래프로 알 수 있는 것")
 st.write(
     "장르별 전체 흥행 규모뿐만 아니라, 각 장르 내에서 어떤 영화가 전체 관객 수의 얼마만큼을 차지하는지 한눈에 비교할 수 있습니다."
+)
+
+st.markdown("<br><br>", unsafe_allow_html=True)
+
+# -------------------------------------------------------------------
+# [세 번째 그래프] 총 관객 수 분포 (히스토그램)
+# -------------------------------------------------------------------
+st.header("3. 총 관객 수 분포")
+
+# 히스토그램 생성
+fig3 = px.histogram(
+    df,
+    x="total_audi",
+    nbins=30,
+    title="영화별 총 관객 수 빈도 분포",
+    labels={"total_audi": "총 관객 수"},
+)
+fig3.update_traces(
+    hovertemplate="<b>관객 수 구간: %{x}</b><br>영화 수: %{y}편"
+)
+
+st.plotly_chart(fig3, use_container_width=True)
+
+# 데이터 동적 동기화 (최다 관객 영화 정보 추출)
+top_movie = df.loc[df["total_audi"].idxmax()]
+top_movie_name = top_movie["movieNm"]
+top_movie_audi = top_movie["total_audi"]
+
+# 구분선 및 설명 구역
+st.markdown("---")
+st.subheader("💡 이 그래프로 알 수 있는 것")
+st.markdown(
+    f"""
+- 대부분의 영화가 **하위 관객 수 구간(약 100만~300만 명 대)**에 밀집해 있는 오른쪽으로 긴 꼬리를 가진 양의 왜도(Positive Skewness) 분포를 보입니다.
+- 데이터에서 가장 관객 수가 많은 최상위 흥행 영화는 **'{top_movie_name}'** (총 {top_movie_audi:,.0f}명)입니다.
+"""
 )
