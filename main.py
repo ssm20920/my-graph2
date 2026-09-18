@@ -14,20 +14,12 @@ def load_data():
     url = "https://raw.githubusercontent.com/greatsong/modudata/main/data/kobis_movies.csv"
     df = pd.read_csv(url)
     
-    # 필수 컬럼 결측치 및 중복 제거
-    req_cols = ['genre', 'movieNm', 'movieCd', 'total_audi', 'first_scrn', 'first_week_audi', 'nation', 'days_in_top10']
-    if 'salesAmt' in df.columns:
-        req_cols.append('salesAmt')
-        
-    df = df.dropna(subset=req_cols).copy()
+    # 결측치 및 중복 제거
+    df = df.dropna(subset=['genre', 'movieNm', 'movieCd', 'total_audi', 'first_scrn', 'first_week_audi', 'nation', 'days_in_top10']).copy()
     df = df.drop_duplicates(subset=['movieCd']).copy()
     
     # 장르 전처리 (첫 번째 장르만 사용)
     df['genre'] = df['genre'].astype(str).str.split('|').str[0]
-    
-    # 관객 1인당 평균 티켓 단가(객단가) 계산
-    if 'salesAmt' in df.columns:
-        df['avg_ticket_price'] = (df['salesAmt'] / df['total_audi']).round(0)
     
     # 트리맵용 고유 식별 레이블
     df['movie_label'] = df['movieNm'] + " (" + df['movieCd'].astype(str) + ")"
@@ -238,9 +230,9 @@ st.info("**이 그래프로 알 수 있는 것:** 중심 원에서 주요 국가
 st.markdown("---")
 
 # ---------------------------------------------------------
-# 8. 박스오피스 상위권에 오래 버틴 영화가 결국 대박이 날까? (산점도)
+# 8. 10위권에 오래 머문 영화는 총 관객도 많은가 (산점도)
 # ---------------------------------------------------------
-st.subheader("8. 박스오피스 상위권에 오래 버틴 영화가 결국 대박이 날까?")
+st.subheader("8. 10위권에 오래 머문 영화는 총 관객도 많은가")
 
 fig8 = px.scatter(
     df,
@@ -248,7 +240,7 @@ fig8 = px.scatter(
     y='total_audi',
     color='genre',
     hover_name='movieNm',
-    title="Top 10 체류 일수와 총 관객수의 관계",
+    title="10위권에 오래 머문 영화는 총 관객도 많은가",
     labels={
         'days_in_top10': '10위권에 머문 날수 (일)',
         'total_audi': '총 관객수 (명)',
@@ -262,62 +254,3 @@ fig8.update_traces(
 
 st.plotly_chart(fig8, use_container_width=True)
 st.info("**이 그래프로 알 수 있는 것:** 박스오피스 Top 10에 머무른 기간이 길어질수록 총 관객수 역시 확연히 증가하는 강한 양의 상관관계를 확인할 수 있습니다.")
-
-# ---------------------------------------------------------
-# 9. 영화의 관객 수와 매출액 사이에는 어떤 상관관계가 있는가? (산점도)
-# ---------------------------------------------------------
-if 'salesAmt' in df.columns:
-    st.markdown("---")
-    st.subheader("9. 영화의 관객 수와 매출액 사이에는 어떤 상관관계가 있는가?")
-
-    fig9 = px.scatter(
-        df,
-        x='total_audi',
-        y='salesAmt',
-        color='genre',
-        hover_name='movieNm',
-        title="총 관객수와 매출액의 상관관계",
-        labels={
-            'total_audi': '총 관객수 (명)',
-            'salesAmt': '총 매출액 (원)',
-            'genre': '장르'
-        }
-    )
-
-    fig9.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br>총 관객수: %{x:,}명<br>총 매출액: %{y:,}원"
-    )
-
-    st.plotly_chart(fig9, use_container_width=True)
-    st.info("**이 그래프로 알 수 있는 것:** 관객 수와 매출액 간에 매우 강력한 선형(양의) 상관관계가 존재함을 알 수 있습니다.")
-
-# ---------------------------------------------------------
-# 10. 영화의 관객 수에서 매출액으로 내려가면 무엇이 보이나? (산점도 + 객단가)
-# ---------------------------------------------------------
-if 'salesAmt' in df.columns and 'avg_ticket_price' in df.columns:
-    st.markdown("---")
-    st.subheader("10. 영화의 관객 수에서 매출액으로 내려가면 무엇이 보이나?")
-
-    fig10 = px.scatter(
-        df,
-        x='total_audi',
-        y='salesAmt',
-        size='avg_ticket_price',
-        color='genre',
-        hover_name='movieNm',
-        custom_data=['avg_ticket_price'],
-        title="관객 수 대비 매출액과 평균 티켓 단가(객단가)",
-        labels={
-            'total_audi': '총 관객수 (명)',
-            'salesAmt': '총 매출액 (원)',
-            'avg_ticket_price': '평균 티켓 단가 (원)',
-            'genre': '장르'
-        }
-    )
-
-    fig10.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br>총 관객수: %{x:,}명<br>총 매출액: %{y:,}원<br>평균 티켓 단가: %{customdata[0]:,}/인"
-    )
-
-    st.plotly_chart(fig10, use_container_width=True)
-    st.info("**이 그래프로 알 수 있는 것:** 단순히 관객 수만으로 설명되지 않는 '평균 티켓 단가(객단가)' 차이가 드러납니다. IMAX/4DX 등 특별관 비중이 높은 영화일수록 버블 크기(단가)가 크고 매출액 축(Y축) 위쪽에 위치하는 패턴을 볼 수 있습니다.")
