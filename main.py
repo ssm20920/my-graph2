@@ -15,6 +15,10 @@ def load_data():
     df = pd.read_csv(DATA_URL)
     # 장르(genre)가 세로막대 기호(|)로 분리되어 있는 경우 첫 번째 장르만 추출
     df['genre'] = df['genre'].astype(str).str.split('|').str[0]
+    
+    # 결측치 제거 및 데이터 타입 정형화
+    df = df.dropna(subset=['genre', 'movieNm', 'total_audi'])
+    
     return df
 
 df = load_data()
@@ -52,9 +56,12 @@ st.divider()
 # ---------------------------------------------------------
 st.subheader("2. 장르별 영화 총 관객 수 트리맵")
 
-# 트리맵 생성 (장르 -> 영화명 계층 구조)
+# 트리맵 오류 방지를 위한 데이터 전처리: 장르와 영화명 기준 관객수 합산
+df_treemap = df.groupby(['genre', 'movieNm'], as_index=False)['total_audi'].sum()
+
+# 트리맵 생성
 fig_treemap = px.treemap(
-    df,
+    df_treemap,
     path=[px.Constant("전체"), 'genre', 'movieNm'],
     values='total_audi',
     color='genre',
