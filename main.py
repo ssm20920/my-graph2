@@ -17,7 +17,7 @@ def load_data():
     df['genre'] = df['genre'].astype(str).str.split('|').str[0]
     
     # 결측치 제거 및 데이터 타입 정형화
-    df = df.dropna(subset=['genre', 'movieNm', 'total_audi'])
+    df = df.dropna(subset=['genre', 'movieNm', 'total_audi', 'first_scrn'])
     
     return df
 
@@ -108,5 +108,36 @@ st.info(
     f"💡 **이 그래프로 알 수 있는 것:** 대부분의 영화는 관객 수가 낮은 구간(약 100만 명 이하)에 집중되어 있는 오른쪽으로 긴 꼬리 분포를 보입니다. "
     f"가장 관객이 많은 영화는 **'{top_title}'**(총 관객 수 {top_audi:,}명)입니다."
 )
+
+st.divider()
+
+# ---------------------------------------------------------
+# 4. 개봉일 스크린수와 총 관객 수의 관계 (산점도)
+# ---------------------------------------------------------
+st.subheader("4. 개봉일 스크린수 vs 총 관객 수")
+
+# 산점도 생성
+fig_scatter = px.scatter(
+    df,
+    x='first_scrn',
+    y='total_audi',
+    color='genre',
+    hover_name='movieNm',
+    title="개봉일 스크린수와 총 관객 수의 상호관계",
+    labels={
+        'first_scrn': '개봉일 스크린수(개)',
+        'total_audi': '총 관객 수(명)',
+        'genre': '장르'
+    }
+)
+
+# 툴팁 스타일 및 표시 정보 설정
+fig_scatter.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>개봉일 스크린수: %{x:,}개<br>총 관객 수: %{y:,}명"
+)
+
+st.plotly_chart(fig_scatter, use_container_width=True)
+
+st.info("💡 **이 그래프로 알 수 있는 것:** 개봉일 스크린수가 많을수록 총 관객 수도 증가하는 양의 상관관계를 보이지만, 일부 영화는 적은 스크린수에도 불구하고 높은 총 관객 수를 기록하는 입소문 흥행 양상을 확인할 수 있습니다.")
 
 st.divider()
