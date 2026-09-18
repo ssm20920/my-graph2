@@ -17,11 +17,15 @@ def load_data():
     url = "https://raw.githubusercontent.com/greatsong/modudata/main/data/kobis_movies.csv"
     df = pd.read_csv(url)
     
-    # genre 열 전처리 (첫 번째 장르만 추출)
+    # genre 열 안전한 전처리 (첫 번째 장르만 추출)
     if 'genre' in df.columns:
         df['genre'] = df['genre'].astype(str).str.split('|').str[0]
         
     return df
+
+# 전역 데이터 변수 정의
+df = load_data()
+
 
 # =========================================================
 # 1. 장르별 영화 편수 (도넛 차트)
